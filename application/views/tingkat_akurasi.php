@@ -17,16 +17,7 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <div class="col-xs-4">
-                            <a href="<?php echo site_url('Home/perangkingan') ?>"><button type="button" class="btn btn-block btn-primary">Rangking Kost Keseluruhan</button></a>
-                        </div>
-                        <div class="col-xs-4">
-                            <a href="<?php echo site_url('Home/rangking_cowok') ?>"><button type="button" class="btn btn-block btn-primary">Rangking Kost Cowok</button></a>
-                        </div>
-                        <div class="col-xs-4">
-                            <a href="<?php echo site_url('Home/rangking_cewek') ?>"><button type="button" class="btn btn-block btn-primary">Rangking Kost Cewek</button></a>
-                        </div>
-                        <center><h3>Perangkingan Kost Cewek</h3></center>
+                        <center><h3>Pengujian Akurasi</h3></center>
                     </div>
                     <div class="col-xs-12">
                         <select id="parameter">
@@ -129,35 +120,7 @@
                     <div class="col-xs-4"></div>
                     <div class="col-xs-4"><button onclick="submit()" type="button" class="btn btn-block btn-primary">SUBMIT</button></div>
                     <div class="col-xs-4"></div>
-                    <br><br>
-
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Ranking</th>
-                                    <th>Nama</th>
-                                    <th>Alamat</th>
-                                    <th>Nilai Prefensi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $no = 1;
-                                foreach ($data as $d) {
-                                    ?>
-                                    <tr>
-                                        <td><?php echo $no++; ?></td>
-                                        <td><?php echo $d['nama']; ?></td>
-                                        <td><?php echo $d['alamat']; ?></td>
-                                        <td><?php echo $d['nilai_preferensi']; ?></td>
-                                    </tr>
-                                <?php }
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
+                    <br><br><br>
                     <!-- /.box-body -->
                 </div>
                 <!-- /.box -->
@@ -200,9 +163,47 @@ $jk4 = json_encode($k4);
 $jk5 = json_encode($k5);
 $jk6 = json_encode($k6);
 $jk7 = json_encode($k7);
+
+$max = array();
+$max[] = $this->M_kriteria->getK1Max();
+$max[] = $this->M_kriteria->getK2Max();
+$max[] = $this->M_kriteria->getK3Max();
+$max[] = $this->M_kriteria->getK4Max();
+$max[] = $this->M_kriteria->getK5Max();
+$max[] = $this->M_kriteria->getK6Max();
+$max[] = $this->M_kriteria->getK7Max();
+
+$sk1 = array();
+$sk2 = array();
+$sk3 = array();
+$sk4 = array();
+$sk5 = array();
+$sk6 = array();
+$sk7 = array();
+$nama_orang = array();
+foreach ($kriteria as $d) {
+    $sk1[] = round($d['kos_ub'] / $max[0], 3);
+    $sk2[] = round($d['kos_makanan'] / $max[1], 3);
+    $sk3[] = round($d['kos_jalan'] / $max[2], 3);
+    $sk4[] = round($d['fasilitas'] / $max[3], 3);
+    $sk5[] = round($d['kenyamanan'] / $max[4], 3);
+    $sk6[] = round($d['keamanan'] / $max[5], 3);
+    $sk7[] = round($d['harga'] / $max[6], 3);
+    $nama_orang[] = $d['nama'];
+}
+
+$jsk1 = json_encode($sk1);
+$jsk2 = json_encode($sk2);
+$jsk3 = json_encode($sk3);
+$jsk4 = json_encode($sk4);
+$jsk5 = json_encode($sk5);
+$jsk6 = json_encode($sk6);
+$jsk7 = json_encode($sk7);
+$jnama_orang = json_encode($nama_orang);
 ?>
 
 <script type="text/javascript">
+    //AHP
     var index = 0;
     var k1 = <?php echo $jk1; ?>;
     var k2 = <?php echo $jk2; ?>;
@@ -217,7 +218,7 @@ $jk7 = json_encode($k7);
         var total = [];
         var matriks = [];
         var matriks_bobot = [];
-        
+
         for (var i = 0; i < 7; i++) {
             total[i] = 0.0;
         }
@@ -227,7 +228,7 @@ $jk7 = json_encode($k7);
         }
         arr.sort();
         for (var i = 0; i < 7; i++) {
-            for (var j = 0; j < index-1; j++) {
+            for (var j = 0; j < index - 1; j++) {
                 if ((i + 1) === arr[j]) {
                     total[0] += parseFloat(k1[i]);
                     total[1] += parseFloat(k2[i]);
@@ -239,67 +240,126 @@ $jk7 = json_encode($k7);
                 }
             }
         }
-        
-        for (var i = 0; i < index-1; i++) {
+
+        for (var i = 0; i < index - 1; i++) {
             var a = [];
             var total_akhir = 0.0;
-            
-            for (var j = 0; j < index-1; j++) {
+
+            for (var j = 0; j < index - 1; j++) {
                 if (arr[j] === 1) {
                     a[j] = parseFloat(k1[i]);
-                    total_akhir += parseFloat((parseFloat(k1[i]) / total[arr[j]-1]).toFixed(3));
+                    total_akhir += parseFloat((parseFloat(k1[i]) / total[arr[j] - 1]).toFixed(3));
                 } else if (arr[j] === 2) {
                     a[j] = parseFloat(k2[i]);
-                    total_akhir += parseFloat((parseFloat(k2[i]) / total[arr[j]-1]).toFixed(3));
+                    total_akhir += parseFloat((parseFloat(k2[i]) / total[arr[j] - 1]).toFixed(3));
                 } else if (arr[j] === 3) {
                     a[j] = parseFloat(k3[i]);
-                    total_akhir += parseFloat((parseFloat(k3[i]) / total[arr[j]-1]).toFixed(3));
+                    total_akhir += parseFloat((parseFloat(k3[i]) / total[arr[j] - 1]).toFixed(3));
                 } else if (arr[j] === 4) {
                     a[j] = parseFloat(k4[i]);
-                    total_akhir += parseFloat((parseFloat(k4[i]) / total[arr[j]-1]).toFixed(3));
+                    total_akhir += parseFloat((parseFloat(k4[i]) / total[arr[j] - 1]).toFixed(3));
                 } else if (arr[j] === 5) {
                     a[j] = parseFloat(k5[i]);
-                    total_akhir += parseFloat((parseFloat(k5[i]) / total[arr[j]-1]).toFixed(3));
+                    total_akhir += parseFloat((parseFloat(k5[i]) / total[arr[j] - 1]).toFixed(3));
                 } else if (arr[j] === 6) {
                     a[j] = parseFloat(k6[i]);
-                    total_akhir += parseFloat((parseFloat(k6[i]) / total[arr[j]-1]).toFixed(3));
+                    total_akhir += parseFloat((parseFloat(k6[i]) / total[arr[j] - 1]).toFixed(3));
                 } else if (arr[j] === 7) {
                     a[j] = parseFloat(k7[i]);
-                    total_akhir += parseFloat((parseFloat(k7[i]) / total[arr[j]-1]).toFixed(3));
+                    total_akhir += parseFloat((parseFloat(k7[i]) / total[arr[j] - 1]).toFixed(3));
                 }
             }
-            
-            var b = (total_akhir / (index-1)).toFixed(3);
-            
+
+            var b = (total_akhir / (index - 1)).toFixed(3);
+
             matriks[i] = a;
             matriks_bobot[i] = b;
-        }       
-        
+        }
+
         var ci = 0;
         var cr = 0;
         var rata_eigen = 0;
         var total_eigen = 0;
-        
-        for (var i = 0; i < index-1; i++) {
+
+        for (var i = 0; i < index - 1; i++) {
             var jumlah = 0;
             var eigen = 0;
-            
+
             for (var j = 0; j < matriks[0].length; j++) {
-                jumlah += (matriks[i][j] * matriks_bobot[j]);                
+                jumlah += (matriks[i][j] * matriks_bobot[j]);
             }
-            
+
             eigen = jumlah / matriks_bobot[i];
             total_eigen += eigen;
         }
-        
-        rata_eigen = total_eigen / (index-1);
-        ci = (rata_eigen-(index-1)) / ((index-1)-1);
-        
+
+        rata_eigen = total_eigen / (index - 1);
+        ci = (rata_eigen - (index - 1)) / ((index - 1) - 1);
+
         var random = [0, 0, 0.58, 0.9, 1.12, 1.24, 1.32];
-        cr = ci / random[index-2];
-        
+        cr = ci / random[index - 2];
+
         console.log(ci);
         console.log(cr);
+
+        //SAW
+        var sk1 = <?php echo $jsk1; ?>;
+        var sk2 = <?php echo $jsk2; ?>;
+        var sk3 = <?php echo $jsk3; ?>;
+        var sk4 = <?php echo $jsk4; ?>;
+        var sk5 = <?php echo $jsk5; ?>;
+        var sk6 = <?php echo $jsk6; ?>;
+        var sk7 = <?php echo $jsk7; ?>;
+        var nama_orang = <?php echo $jnama_orang; ?>;
+        var matriks_saw = [];
+
+        for (var i = 0; i < nama_orang.length; i++) {
+            var a = [];
+
+            for (var j = 0; j < index - 1; j++) {
+                if (arr[j] === 1) {
+                    a[j] = sk1[i];
+                } else if (arr[j] === 2) {
+                    a[j] = sk2[i];
+                } else if (arr[j] === 3) {
+                    a[j] = sk3[i];
+                } else if (arr[j] === 4) {
+                    a[j] = sk4[i];
+                } else if (arr[j] === 5) {
+                    a[j] = sk5[i];
+                } else if (arr[j] === 6) {
+                    a[j] = sk6[i];
+                } else if (arr[j] === 7) {
+                    a[j] = sk7[i];
+                }
+            }
+
+            matriks_saw[i] = a;
+        }
+
+        var nilai_preferensi = [];
+        for (var i = 0; i < matriks_saw.length; i++) {
+            var jumlah = 0;
+
+            for (var j = 0; j < matriks_saw[0].length; j++) {
+                jumlah += (matriks_saw[i][j] * matriks_bobot[j]);
+            }
+
+            nilai_preferensi[i] = jumlah.toFixed(6);
+        }
+        
+        $.ajax({
+            type: "POST",
+            url: "<?php echo base_url('index.php/Home/simpanPreferensi2'); ?>",
+            data: {nama : nama_orang, data : nilai_preferensi},
+            success: function(data) {
+                        window.location = "<?php echo base_url('index.php/Home/pengujian'); ?>";
+                    }, 
+            failed: function(data) {
+                        
+                    }
+        });
+
     }
 
     function visibility(i1, i2, i3, i4, i5, i6, i7) {

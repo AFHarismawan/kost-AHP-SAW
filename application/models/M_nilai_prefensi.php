@@ -6,6 +6,12 @@ class M_nilai_prefensi extends CI_Model{
         $data = $this->db->query("select * from nilai_prefensi a left join data_kriteria b on a.id=b.id where b.jenis_kelamin = 'L' order by nilai_preferensi DESC");
         return $data->result_array();
     }
+    
+    public function getDataCowok2()
+    {
+        $data = $this->db->query("select * from nilai_prefensi2 a left join data_kriteria b on a.id=b.id where b.jenis_kelamin = 'L' order by nilai_preferensi DESC");
+        return $data->result_array();
+    }
 
     public function getDataCewek()
     {
@@ -13,9 +19,21 @@ class M_nilai_prefensi extends CI_Model{
         return $data->result_array();
     }
 
+    public function getDataCewek2()
+    {
+        $data = $this->db->query("select * from nilai_prefensi2 a left join data_kriteria b on a.id=b.id where b.jenis_kelamin = 'P' order by nilai_preferensi DESC");
+        return $data->result_array();
+    }
+    
     public function getDataCampuran()
     {
         $data = $this->db->query("select * from nilai_prefensi a left join data_kriteria b on a.id=b.id order by nilai_preferensi DESC");
+        return $data->result_array();
+    }
+    
+    public function getDataCampuran2()
+    {
+        $data = $this->db->query("select * from nilai_prefensi2 a left join data_kriteria b on a.id=b.id order by nilai_preferensi DESC");
         return $data->result_array();
     }
 

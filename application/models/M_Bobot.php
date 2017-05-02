@@ -11,6 +11,10 @@ class M_Bobot extends CI_Model{
    		$data = $this->db->insert($namatabel,$data);
    		return $data;
     }
+    
+    function deleteTable($namatabel){
+                $this->db->empty_table($namatabel);
+    }
 
     public function editData($where="")
     {
